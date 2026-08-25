@@ -20,11 +20,8 @@ Sakila database, inside a managed sandbox, then answers in plain English.
 - `pyproject.toml`, `uv.lock`: project dependencies.
 - `.env`: API keys (LangSmith and your model provider); never commit this.
 - `artifacts/`: sandbox scratch output, such as charts the agent writes; gitignored.
-- `images/`: workshop slide diagrams; not yet part of this repo, gitignored for now.
 
 ## Steps
-
-There's no notebook for this session; this file is it.
 
 Work through these steps (in your own copy of this project). 
 
@@ -177,8 +174,6 @@ about the difference between a prompt-based constraint and real security, since 
 
 ## 6. Stretch questions
 
-If you finish early:
-
 4. Which actors have appeared in the most films?
 5. What's the average rental duration, by category?
 6. Is there a relationship between a film's length and how often it gets rented?
@@ -188,30 +183,37 @@ If you finish early:
 
 To learn more about deep agents, continue with the full **LangChain Academy Deep Agents course**.
 
+---
+---
+
 ## Appendix
 
 Reference detail for anyone who wants to go past the steps above. None of this is required
 to finish the workshop.
 
-### At a glance: this workshop vs. a typical MDA project
+### MDA components used in this workshop
 
-| Path | In this workshop |
+| Component | What it does |
 |---|---|
-| `agent.py` | Yes, defines the agent, its model, and its tools |
-| `instructions.md` | Yes, the system prompt |
-| `sandbox/__init__.py`, `sandbox/setup.sh` | Yes, declares and provisions the sandbox |
-| `sakila.db` | Yes, the sample database the agent queries |
-| `tools/` | Yes, empty here, add custom tools |
-| `connectors/` | Yes, empty here, declare MCP servers |
-| `pyproject.toml`, `uv.lock` | Yes, project dependencies |
-| `.env` | Yes, API keys |
-| `artifacts/` | Yes, sandbox scratch output |
-| ---- | ---- |
-| `identity.py` | No, adds managed auth, see [Identity](#identity-optional-not-included-here) |
-| `memory.py` | No, adds durable memory, see [Memory](#memory) |
-| `middleware/` | No, custom middleware |
-| `skills/` | No, skills synced to Context Hub |
-| `evals/` | No, Harbor evals, see [Evals](#evals) |
+| `agent.py` | Defines the agent, its model, and its tools |
+| `instructions.md` | The system prompt |
+| `sandbox/__init__.py`, `sandbox/setup.sh` | Declares and provisions the sandbox |
+| `sakila.db` | The sample database the agent queries |
+| `tools/` | Empty here, add custom tools |
+| `connectors/` | Empty here, declare MCP servers |
+| `pyproject.toml`, `uv.lock` | Project dependencies |
+| `.env` | API keys |
+| `artifacts/` | Sandbox scratch output |
+
+### Typical MDA components (opt-in)
+
+| Component | What it does |
+|---|---|
+| `identity.py` | Adds managed auth, see [Identity](#identity-optional-not-included-here) |
+| `memory.py` | Adds durable memory, see [Memory](#memory) |
+| `middleware/` | Custom middleware |
+| `skills/` | Skills synced to Context Hub |
+| `evals/` | Harbor evals, see [Evals](#evals) |
 
 ### Identity (optional, not included here)
 
@@ -220,14 +222,13 @@ callers to authenticate, add `identity.py` exporting an `identity = define_ident
 declaration (for example `auth.langsmith_api_key()`). That gives every caller private
 threads and downstream credentials. See the
 [identity docs](https://docs.langchain.com/langsmith/python/managed-deep-agents-identity)
-for the available `auth.*` options. Durable memory is a separate concept, declared in
-`memory.py`.
+for the available `auth.*` options.
 
 ### Memory
 
 This project declares no memory, so nothing is kept between runs. Add `memory.py`
-exporting `define_memory(scope="agent")` to mount one deployment-shared tree at
-`/memories/agent/`.
+exporting `define_memory(scope="agent")` to give the agent a persistent directory at
+`/memories/agent/`, shared across every thread for this deployment rather than reset per run.
 
 ### Optional runtime pieces
 
@@ -236,6 +237,8 @@ Beyond `tools/` and `sandbox/`, an MDA project can also declare:
 - `middleware/`: custom middleware (not used in this project).
 - `skills/`: skills synced to Context Hub (not used in this project).
 - `connectors/mcp.py`: attaches MCP servers; the file must export a named `connector` declaration (present but empty in this project).
+
+---
 
 ### Sandbox setup script (`sandbox/setup.sh`)
 
@@ -316,8 +319,6 @@ first; pass `--yes` to skip the prompt. Agent memory and thread history are not 
 afterwards.
 
 ### Evals
-
-Extra context, not needed for the workshop itself.
 
 Managed Deep Agent evals are Harbor evals. Author full Harbor tasks directly under
 `evals/tasks/<task>/`. To start from a minimal task, run:
