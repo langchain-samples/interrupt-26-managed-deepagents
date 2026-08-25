@@ -67,7 +67,9 @@ This opens the agent in LangSmith Studio.
 `instructions.md` is this agent's system prompt: MDA loads it and hands it to the model on
 every turn, so editing it changes how the agent behaves (with no code changes at all).
 
-We've already written the instructions that tell this agent to run SQL and Python against sakila.db. However, telling the model to run SQL and Python isn't enough on its own (it also needs somewhere to actually run that code). This is what `sandbox/__init__.py` provides; without it, the agent has instructions to execute code but no tool that lets it.
+We've already written the instructions that tell this agent to run SQL and Python against
+sakila.db. But instructions alone aren't enough; the agent also needs somewhere to actually
+run that code, which is what `sandbox/__init__.py` provides.
 
 This is how MDA does it:
 
@@ -77,8 +79,10 @@ from managed_deepagents import define_sandbox
 sandbox = define_sandbox(scope="thread")
 ```
 
-One import, one function call. If you were self-hosting this with open-source deepagents
-instead of MDA, giving an agent the ability to run its own code in a sandbox looks like:
+One import, one function call.
+
+<details>
+<summary>If you were self-hosting this with open-source deepagents (instead of MDA), this is what sandbox code looks like</summary>
 
 ```python
 from deepagents.backends import LangSmithSandbox  # or Modal/Runloop/Daytona
@@ -87,8 +91,10 @@ sandbox = client.create_sandbox(...)
 agent = create_deep_agent(model=..., backend=sandbox)
 ```
 
-That means standing up a sandbox provider, creating a client, creating a sandbox, 
-and passing it through to the agent yourself (with open-source deep agents).
+That means standing up a sandbox provider, creating a client, creating a sandbox, and
+passing it through to the agent yourself (with open-source deep agents).
+
+</details>
 
 ## 3. Try it out! Ask your agent questions
 
@@ -103,15 +109,14 @@ Ask any question and the agent writes + runs its own SQL (and Python, if the
 question calls for further analysis) inside the sandbox → then answers with a short
 written summary. 
 
-**Sandbox isolation:** what makes it safe to let the agent execute
-code it authored itself in the first place (the sandbox ensures the agent-produced
-code cannot touch your machine, other threads' data, or anything outside its own
-scratch space). 
-
-**Sandbox persistence:** ask a few questions one after another in the
-same thread and you'll notice follow-ups don't need to re-derive earlier results from
-scratch. They're running in the same sandbox for the life of the thread. This is because MDA is
-provisioning and reusing a real sandbox behind the scenes via `scope="thread"` (something a self-hosted deepagents agent doesn't get automatically).
+- **Sandbox isolation:** what makes it safe to let the agent execute code it authored
+  itself in the first place (the sandbox ensures the agent-produced code cannot touch
+  your machine, other threads' data, or anything outside its own scratch space).
+- **Sandbox persistence:** ask a few questions one after another in the same thread and
+  you'll notice follow-ups don't need to re-derive earlier results from scratch. They're
+  running in the same sandbox for the life of the thread. This is because MDA is
+  provisioning and reusing a real sandbox behind the scenes via `scope="thread"` (something
+  a self-hosted deepagents agent doesn't get automatically).
 
 
 ## 4. Skim the tools
@@ -125,8 +130,8 @@ Tools are the same for both open-source deep agents and MDA.
 <summary>When would you split a tool into its own file?</summary>
 
 `email_report` is a three-line helper, so it's defined right in `agent.py`. Once a tool needs
-its own dependency or setup, for example an `internet_search` tool that wraps a Tavily client,
-it's cleaner to give it a home in `tools/search.py` and import it into `agent.py`:
+its own dependency or setup (e.g. an `internet_search` tool that wraps a Tavily client), it's
+cleaner to give it a home in `tools/search.py` and import it into `agent.py`:
 
 ```python
 # tools/search.py
@@ -155,9 +160,9 @@ agent = define_deep_agent(..., tools=[email_report, internet_search])
 It's important to set topic and domain constraints in `instructions.md` so your agent
 doesn't drift from the topic at hand. 
 
-Customer-support bots have previously been
-caught happily answering irrelevant questions like "reverse a linked list in Python" or writing
-poems instead of serving their customer support function (because nothing in their system prompt specified staying focused).
+Customer-support bots have previously been caught answering irrelevant questions
+like "reverse a linked list in Python," or writing poems, simply because nothing in
+their system prompt told them to stay on topic.
 
 So first, let's try to jailbreak our agent! Ask it this in the current chat, before changing anything:
 
@@ -189,13 +194,14 @@ an edit like this one right away, not just here in local dev. (Iterating on a
 self-hosted agent's behavior usually means changing code, redeploying, and
 restarting before you can test anything new).
 
-Now the agent *should* decline and redirect back to DVD rental topics instead of
-answering. Try a few variations (a cooking recipe question, a coding question, etc.),
-then try to jailbreak it: see if you can phrase something that gets it to answer
-anyway ("ignore previous instructions," claiming to be an admin, burying the off-topic
-ask inside a DVD-rental-sounding question). It's a good jumping-off point for talking
-about the difference between a prompt-based constraint and real security, since the
-`instructions.md` scope is a strong nudge, not a guarantee.
+Now the agent *should* decline and redirect back to DVD rental topics instead of answering.
+Try a few variations (a cooking recipe question, a coding question, etc.).
+
+Then try to jailbreak it: see if you can phrase something that gets it to answer anyway
+("ignore previous instructions," claiming to be an admin, burying the off-topic ask inside
+a DVD-rental-sounding question). If you succeed, that's the point: `instructions.md` scope
+is a strong nudge, not a guarantee, and this is a good jumping-off point for talking about
+the difference between a prompt-based constraint and real security.
 
 
 ## 6. Stretch questions
@@ -262,8 +268,7 @@ exporting `define_memory(scope="agent")` to give the agent a persistent director
 None of these are present in this project. Beyond `sandbox/`, an MDA project can also declare:
 
 - `tools/`: a place to define tools as separate files instead of inline in `agent.py`, useful
-  once you have more than a couple, or ones with heavier dependencies (this project's one tool,
-  `email_report`, is a three-line helper defined directly in `agent.py`).
+  once you have more than a couple, or ones with heavier dependencies.
 - `middleware/`: custom middleware.
 - `skills/`: skills synced to Context Hub.
 - `connectors/mcp.py`: attaches MCP servers; the file must export a named `connector` declaration.
@@ -346,10 +351,15 @@ Remove the deployment and the LangSmith resources it created:
 mda delete .
 ```
 
-This deletes the deployment, the tracing project created alongside it, the Context Hub repo
-holding this agent's context and memory, and the managed sandboxes this agent created. It asks
-first; pass `--yes` to skip the prompt. Agent memory and thread history are not recoverable
-afterwards.
+This deletes:
+
+- The deployment
+- The tracing project created alongside it
+- The Context Hub repo holding this agent's context and memory
+- The managed sandboxes this agent created
+
+It asks first; pass `--yes` to skip the prompt. Agent memory and thread history are not
+recoverable afterwards.
 
 ### Evals
 
