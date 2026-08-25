@@ -117,14 +117,14 @@ provisioning and reusing a real sandbox behind the scenes via `scope="thread"` (
 ## 4. Skim the tools
 
 Open `agent.py` and look at the `tools=[...]` list. It has one custom tool,
-`format_currency`, a plain Python function decorated with `@tool`. 
+`email_report`, a plain Python function decorated with `@tool`. 
 
 Tools are the same for both open-source deep agents and MDA.
 
 <details>
 <summary>When would you split a tool into its own file?</summary>
 
-`format_currency` is a two-line helper, so it's defined right in `agent.py`. Once a tool needs
+`email_report` is a three-line helper, so it's defined right in `agent.py`. Once a tool needs
 its own dependency or setup, for example an `internet_search` tool that wraps a Tavily client,
 it's cleaner to give it a home in `tools/search.py` and import it into `agent.py`:
 
@@ -144,7 +144,7 @@ def internet_search(query: str, max_results: int = 5) -> str:
 # agent.py
 from tools.search import internet_search
 
-agent = define_deep_agent(..., tools=[format_currency, internet_search])
+agent = define_deep_agent(..., tools=[email_report, internet_search])
 ```
 
 </details>
@@ -263,7 +263,7 @@ None of these are present in this project. Beyond `sandbox/`, an MDA project can
 
 - `tools/`: a place to define tools as separate files instead of inline in `agent.py`, useful
   once you have more than a couple, or ones with heavier dependencies (this project's one tool,
-  `format_currency`, is a two-line helper defined directly in `agent.py`).
+  `email_report`, is a three-line helper defined directly in `agent.py`).
 - `middleware/`: custom middleware.
 - `skills/`: skills synced to Context Hub.
 - `connectors/mcp.py`: attaches MCP servers; the file must export a named `connector` declaration.

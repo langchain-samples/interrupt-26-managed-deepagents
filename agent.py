@@ -3,13 +3,13 @@ from managed_deepagents import define_deep_agent
 
 
 @tool
-def format_currency(amount: float) -> str:
-    """Format a raw number as a US dollar amount, e.g. 1234.5 -> "$1,234.50"."""
-    return f"${amount:,.2f}"
+def email_report(to: str, subject: str, body: str) -> str:
+    """Email a report to a stakeholder. This simulates a send, no network call is made."""
+    return f"Emailed {to}: {subject}"
 
 
 agent = define_deep_agent(
     name="dvd-rental-analyst",
     model="anthropic:claude-sonnet-5",
-    tools=[format_currency],
+    tools=[email_report],
 )
