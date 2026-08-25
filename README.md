@@ -185,7 +185,11 @@ To learn more about deep agents, continue with the full **LangChain Academy Deep
 
 
 <details>
-<summary><strong>Appendix</strong> — optional reference, not required to finish the workshop</summary>
+<summary>
+
+## Appendix: optional reference, not required to finish the workshop
+
+</summary>
 
 ### MDA components used in this workshop
 
