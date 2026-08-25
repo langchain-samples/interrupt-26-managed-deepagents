@@ -68,8 +68,9 @@ Agent Server URL and a LangSmith dashboard URL.
 
 ![Terminal output from mda deploy ., ending with the Agent Server and Dashboard URLs](images/CLI.png)
 
-**Open the dashboard URL**, then click into the deployment and open **Studio** from there to
-chat with your agent.
+**Copy and paste the dashboard URL**, it will open up in LangSmith Deployments. Then click on the
+blue **Connect** button in the top right corner and click the **Open in Studio** button to chat
+with your agent.
 
 
 ## 2. Skim the wiring (read-only)
