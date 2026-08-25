@@ -23,3 +23,6 @@ __pycache__/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Slide diagrams, not part of the workshop repo yet.
+images/
