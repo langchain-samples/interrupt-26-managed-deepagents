@@ -184,10 +184,8 @@ about the difference between a prompt-based constraint and real security, since 
 To learn more about deep agents, continue with the full **LangChain Academy Deep Agents course**.
 
 
-## Appendix
-
-Reference detail for anyone who wants to go past the steps above. None of this is required
-to finish the workshop.
+<details>
+<summary><strong>Appendix</strong> — optional reference, not required to finish the workshop</summary>
 
 ### MDA components used in this workshop
 
@@ -335,3 +333,5 @@ mda evals compile .                 # all tasks
 mda evals compile . --task my-task  # only my-task
 # follow the printed `harbor run` command
 ```
+
+</details>
