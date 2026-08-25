@@ -1,4 +1,28 @@
 # Managed Deep Agents (MDA)
+
+## Overview
+
+Workshop project for Interrupt 2026 NYC: a DVD-rental analyst agent built on
+[`managed-deepagents`](https://github.com/langchain-ai/managed-deepagents-sdk) (MDA). Ask it a
+business question and it writes and runs its own SQL (and Python, for charts) against a sample
+Sakila database, inside a managed sandbox, then answers in plain English.
+
+## What's in this repo
+
+- `README.md`: this file, the workshop walkthrough plus a reference appendix.
+- `agent.py`: defines the agent, its model, and its tools. The `name` here is also the deploy id.
+- `instructions.md`: the agent's system prompt, loaded fresh on every turn.
+- `identity.py`: declares who may call this deployment.
+- `sandbox/__init__.py`: declares the managed sandbox the agent runs code in.
+- `sandbox/setup.sh`: one-time script that provisions that sandbox (loads the Sakila database, installs Python packages).
+- `sakila.db`: the sample DVD-rental SQLite database the agent queries.
+- `tools/`: optional custom tools beyond the one already in `agent.py` (empty for now).
+- `connectors/`: optional MCP server declarations (empty for now).
+- `pyproject.toml`, `uv.lock`: project dependencies.
+- `.env`: API keys (LangSmith and your model provider); never commit this.
+- `artifacts/`: sandbox scratch output, such as charts the agent writes; gitignored.
+- `images/`: workshop slide diagrams; not yet part of this repo, gitignored for now.
+
 ## Steps
 
 There's no notebook for this session; this file is it.
@@ -164,3 +188,128 @@ If you finish early:
 ## Go deeper
 
 To learn more about deep agents, continue with the full **LangChain Academy Deep Agents course**.
+
+## Appendix
+
+Reference detail for anyone who wants to go past the steps above. None of this is required
+to finish the workshop.
+
+### Identity
+
+`identity.py` enables managed authentication: threads and downstream credentials are
+per-caller. Set `auth` to one or more `auth.*` entries if browsers call the deployment
+directly. Durable memory is declared separately, in `memory.py`.
+
+### Memory
+
+This project declares no memory, so nothing is kept between runs. Add `memory.py`
+exporting `define_memory(scope="agent")` to mount one deployment-shared tree at
+`/memories/agent/`.
+
+### Optional runtime pieces
+
+Beyond `tools/` and `sandbox/`, an MDA project can also declare:
+
+- `middleware/`: custom middleware (not used in this project).
+- `skills/`: skills synced to Context Hub (not used in this project).
+- `connectors/mcp.py`: attaches MCP servers; the file must export a named `connector` declaration (present but empty in this project).
+
+### Sandbox setup script (`sandbox/setup.sh`)
+
+MDA embeds `sandbox/setup.sh` and runs it once, the first time this project's sandbox is
+provisioned. Line by line, this project's version:
+
+```bash
+pip install --quiet --break-system-packages pandas matplotlib
+```
+Installs the two libraries the agent's Python analysis relies on: `pandas` for querying and
+shaping data, `matplotlib` for the charts it can produce.
+
+```bash
+curl -s -o /tmp/sakila-schema.sql https://raw.githubusercontent.com/jOOQ/sakila/main/sqlite-sakila-db/sqlite-sakila-schema.sql
+curl -s -o /tmp/sakila-data.sql https://raw.githubusercontent.com/jOOQ/sakila/main/sqlite-sakila-db/sqlite-sakila-insert-data.sql
+sqlite3 sakila.db < /tmp/sakila-schema.sql
+sqlite3 sakila.db < /tmp/sakila-data.sql
+rm -f /tmp/sakila-schema.sql /tmp/sakila-data.sql
+```
+Downloads the Sakila sample database's schema and its data as two SQL files, loads both into
+`sakila.db`, then deletes the downloaded files since they've already served their purpose.
+
+```bash
+mkdir -p artifacts
+```
+Creates the `artifacts/` directory the sandbox writes generated files to (such as the charts
+`matplotlib` produces), so the very first write doesn't fail on a missing folder.
+
+### Deploy
+
+Compile and deploy the project to LangSmith:
+
+```bash
+mda deploy .
+```
+
+This copies your files verbatim, generates a managed entry module, and writes a deployable
+build (including `langgraph.json`) to `.mda/build`. The CLI uploads that build to LangSmith to
+run your agent on the managed runtime.
+
+Common options:
+
+```bash
+mda deploy . --name dvd-rental-analyst-dev --deployment-type dev
+mda deploy . --workspace-id "$LANGSMITH_WORKSPACE_ID"
+mda deploy . --no-wait
+```
+
+Deploy prints both the Agent Server URL to call and the LangSmith dashboard URL to inspect.
+`mda deploy` loads `.env`, uses `LANGSMITH_API_KEY` for LangSmith, and forwards model provider
+keys such as `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` as deployment secrets. Set
+`LANGSMITH_WORKSPACE_ID`, or pass `--workspace-id`, if your LangSmith API key requires a
+workspace selection.
+
+### Logs
+
+Read the deployed agent's server logs:
+
+```bash
+mda logs .
+mda logs . --lines 200 --level error
+```
+
+In a terminal this streams new output until you press Ctrl-C. When the output is piped or
+redirected, it prints the most recent lines (1000 by default) and exits.
+
+### Delete
+
+Remove the deployment and the LangSmith resources it created:
+
+```bash
+mda delete .
+```
+
+This deletes the deployment, the tracing project created alongside it, the Context Hub repo
+holding this agent's context and memory, and the managed sandboxes this agent created. It asks
+first; pass `--yes` to skip the prompt. Agent memory and thread history are not recoverable
+afterwards.
+
+### Evals
+
+Extra context, not needed for the workshop itself.
+
+Managed Deep Agent evals are Harbor evals. Author full Harbor tasks directly under
+`evals/tasks/<task>/`. To start from a minimal task, run:
+
+```bash
+mda evals init my-task
+```
+
+This creates the optional scaffold `evals/scaffold/my-task/` with an `instruction.md` and a
+language verifier. Run the same command with another name to add more scaffolds. At compile
+time MDA copies selected scaffolds to `evals/tasks/` and preserves every other task. Compile
+the managed agent, then run Harbor yourself:
+
+```bash
+mda evals compile .                 # all tasks
+mda evals compile . --task my-task  # only my-task
+# follow the printed `harbor run` command
+```
