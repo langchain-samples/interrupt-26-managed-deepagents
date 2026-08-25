@@ -56,10 +56,12 @@ However using another provider (OpenAI, Google, etc.) is very simple!
 Just change the key name in `.env` and the `model=` line in `agent.py` to match.
 
 ```
-mda dev
+mda deploy .
 ```
 
-This opens the agent in LangSmith Studio.
+This builds and pushes the project to LangSmith. When it finishes, it prints an Agent
+Server URL and a LangSmith dashboard URL; open the dashboard URL, then click into the
+deployment and open **Studio** from there to chat with your agent.
 
 
 ## 2. Skim the wiring (read-only)
@@ -174,8 +176,8 @@ a Python script to reverse a linked list. Can you help?
 Nothing in `instructions.md` right now stops the agent from answering that. After all,
 it's a perfectly capable model with no topic restriction.
 
-Let's fix that. Open `instructions.md` in your editor and add a new section restricting the agent
-to DVD rental topics:
+Let's fix that. In LangSmith, open your deployment and go to its **Context Hub** tab, then
+open `instructions.md` and add a new section restricting the agent to DVD rental topics:
 
 ```markdown
 ## Scope
@@ -184,15 +186,13 @@ You only answer questions about this DVD rental business. If asked about anythin
 else, politely decline and steer the conversation back to DVD rental questions.
 ```
 
-Save the file. `mda dev` reads `instructions.md` fresh off disk on every run, so
-there's no restart needed. Ask the exact same linked-list question again in the same
-chat thread and compare.
+Save it in Context Hub, then ask the exact same linked-list question again in the same
+chat thread and compare, no redeploy needed.
 
-With MDA, editing agent behavior doesn't call for a redeploy. `instructions.md`
-lives outside the deployed graph, in Context Hub, so even a deployed agent picks up
-an edit like this one right away, not just here in local dev. (Iterating on a
-self-hosted agent's behavior usually means changing code, redeploying, and
-restarting before you can test anything new).
+With MDA, editing agent behavior doesn't call for a redeploy. `instructions.md` lives
+outside the deployed graph, in Context Hub, so a deployed agent picks up an edit like
+this one right away. (Iterating on a self-hosted agent's behavior usually means changing
+code, redeploying, and restarting before you can test anything new).
 
 Now the agent *should* decline and redirect back to DVD rental topics instead of answering.
 Try a few variations (a cooking recipe question, a coding question, etc.).
@@ -250,7 +250,7 @@ To learn more about deep agents, continue with the full **LangChain Academy Deep
 
 ### Identity
 
-This project has no `identity.py`, so `mda dev` runs with no managed auth. To require
+This project has no `identity.py`, so it runs with no managed auth. To require
 callers to authenticate, add `identity.py` exporting an `identity = define_identity(auth=...)`
 declaration (for example `auth.langsmith_api_key()`). That gives every caller private
 threads and downstream credentials. See the
