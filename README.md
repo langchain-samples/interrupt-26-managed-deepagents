@@ -86,7 +86,8 @@ One import, one function call.
 <details>
 <summary>If you were self-hosting this with open-source deepagents (instead of MDA):</summary>
 
-this is what sandbox code looks like:
+
+This is what sandbox code looks like:
 
 ```python
 from deepagents.backends import LangSmithSandbox  # or Modal/Runloop/Daytona
