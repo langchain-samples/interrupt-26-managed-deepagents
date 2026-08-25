@@ -216,7 +216,7 @@ To learn more about deep agents, continue with the full **LangChain Academy Deep
 | `skills/` | Skills synced to Context Hub |
 | `evals/` | Harbor evals, see [Evals](#evals) |
 
-### Identity (optional, not included here)
+### Identity
 
 This project has no `identity.py`, so `mda dev` runs with no managed auth. To require
 callers to authenticate, add `identity.py` exporting an `identity = define_identity(auth=...)`
@@ -244,13 +244,15 @@ Beyond `tools/` and `sandbox/`, an MDA project can also declare:
 ### Sandbox setup script (`sandbox/setup.sh`)
 
 MDA embeds `sandbox/setup.sh` and runs it once, the first time this project's sandbox is
-provisioned. Line by line, this project's version:
+provisioned.
 
 ```bash
 pip install --quiet --break-system-packages pandas matplotlib
 ```
-Installs the two libraries the agent's Python analysis relies on: `pandas` for querying and
-shaping data, `matplotlib` for the charts it can produce.
+Installs the two libraries the agent's Python analysis relies on:
+
+- `pandas` for querying and shaping data
+- `matplotlib` for the charts it can produce
 
 ```bash
 curl -s -o /tmp/sakila-schema.sql https://raw.githubusercontent.com/jOOQ/sakila/main/sqlite-sakila-db/sqlite-sakila-schema.sql
@@ -280,19 +282,19 @@ This copies your files verbatim, generates a managed entry module, and writes a 
 build (including `langgraph.json`) to `.mda/build`. The CLI uploads that build to LangSmith to
 run your agent on the managed runtime.
 
-Common options:
+Common options (each line below is a separate example, not meant to be combined):
 
 ```bash
-mda deploy . --name dvd-rental-analyst-dev --deployment-type dev
-mda deploy . --workspace-id "$LANGSMITH_WORKSPACE_ID"
-mda deploy . --no-wait
+mda deploy . --name dvd-rental-analyst-dev --deployment-type dev  # custom deploy name and type
+mda deploy . --workspace-id "$LANGSMITH_WORKSPACE_ID"             # target a specific workspace
+mda deploy . --no-wait                                            # return immediately, don't wait for the build
 ```
 
-Deploy prints both the Agent Server URL to call and the LangSmith dashboard URL to inspect.
-`mda deploy` loads `.env`, uses `LANGSMITH_API_KEY` for LangSmith, and forwards model provider
-keys such as `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` as deployment secrets. Set
-`LANGSMITH_WORKSPACE_ID`, or pass `--workspace-id`, if your LangSmith API key requires a
-workspace selection.
+- Deploy prints both the Agent Server URL to call and the LangSmith dashboard URL to inspect.
+- `mda deploy` loads `.env`, uses `LANGSMITH_API_KEY` for LangSmith, and forwards model provider
+  keys such as `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` as deployment secrets.
+- Set `LANGSMITH_WORKSPACE_ID`, or pass `--workspace-id`, if your LangSmith API key requires a
+  workspace selection.
 
 ### Logs
 
