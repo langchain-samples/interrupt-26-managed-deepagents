@@ -179,12 +179,9 @@ about the difference between a prompt-based constraint and real security, since 
 6. Is there a relationship between a film's length and how often it gets rented?
 
 
-## Go deeper
-
-To learn more about deep agents, continue with the full **LangChain Academy Deep Agents course**.
-
----
----
+> ## Go deeper
+>
+> To learn more about deep agents, continue with the full **LangChain Academy Deep Agents course**.
 
 ## Appendix
 
