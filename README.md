@@ -122,14 +122,11 @@ Ask any question and the agent writes + runs its own SQL (and Python, if the
 question calls for further analysis) inside the sandbox → then answers with a short
 written summary. 
 
-- **Sandbox isolation:** what makes it safe to let the agent execute code it authored
-  itself in the first place (the sandbox ensures the agent-produced code cannot touch
-  your machine, other threads' data, or anything outside its own scratch space).
-- **Sandbox persistence:** ask a few questions one after another in the same thread and
-  you'll notice follow-ups don't need to re-derive earlier results from scratch. They're
-  running in the same sandbox for the life of the thread. This is because MDA is
-  provisioning and reusing a real sandbox behind the scenes via `scope="thread"` (something
-  a self-hosted deepagents agent doesn't get automatically).
+- **Sandbox isolation:** the agent's code can't touch your machine, other threads' data, or
+  anything outside its own scratch space.
+- **Sandbox persistence:** follow-up questions in the same thread reuse earlier results
+  instead of recomputing them, because MDA provisions one real sandbox per thread
+  (`scope="thread"`) and reuses it. Self-hosted deepagents doesn't do this automatically.
 
 
 ## 4. Skim the tools
@@ -174,9 +171,9 @@ agent = define_deep_agent(..., tools=[email_report, internet_search])
 It's important to set topic and domain constraints in `instructions.md` so your agent
 doesn't drift from the topic at hand. 
 
-Customer-support bots have previously been caught answering irrelevant questions
-like "reverse a linked list in Python," or writing poems, simply because nothing in
-their system prompt told them to stay on topic.
+> *Customer-support bots have previously been caught answering irrelevant questions
+> like "reverse a linked list in Python," or writing poems, simply because nothing in
+> their system prompt told them to stay on topic.*
 
 So first, let's try to jailbreak our agent! Ask it this in the current chat, before changing anything:
 
