@@ -85,7 +85,7 @@ One import, one function call.
 
 <details>
 <summary>If you were self-hosting this with open-source deepagents (instead of MDA):</summary>
-
+<br>
 
 This is what sandbox code looks like:
 
