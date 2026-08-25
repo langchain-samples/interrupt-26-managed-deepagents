@@ -25,4 +25,5 @@ Thumbs.db
 desktop.ini
 
 # Slide diagrams, not part of the workshop repo yet.
-images/
+images/*
+!images/CLI too narrow.png
