@@ -133,6 +133,7 @@ Tools are the same for both open-source deep agents and MDA.
 
 <details>
 <summary>When would you split a tool into its own file?</summary>
+<br>
 
 `email_report` is a three-line helper, so it's defined right in `agent.py`. Once a tool needs
 its own dependency or setup (e.g. an `internet_search` tool that wraps a Tavily client), it's
