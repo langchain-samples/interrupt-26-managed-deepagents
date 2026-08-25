@@ -18,6 +18,7 @@ Sakila database, inside a managed sandbox, then answers in plain English.
 - `pyproject.toml`, `uv.lock`: project dependencies.
 - `.env`: API keys (LangSmith and your model provider); never commit this.
 - `artifacts/`: sandbox scratch output; gitignored.
+- `images/`: screenshots used in this README.
 
 ## Steps
 
@@ -63,8 +64,12 @@ mda deploy .
 ```
 
 This builds and pushes the project to LangSmith. When it finishes (~5mins), it prints an
-Agent Server URL and a LangSmith dashboard URL; **open the dashboard URL**, then click into
-the deployment and open **Studio** from there to chat with your agent.
+Agent Server URL and a LangSmith dashboard URL.
+
+![Terminal output from mda deploy ., ending with the Agent Server and Dashboard URLs](images/CLI.png)
+
+**Open the dashboard URL**, then click into the deployment and open **Studio** from there to
+chat with your agent.
 
 
 ## 2. Skim the wiring (read-only)
