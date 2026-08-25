@@ -141,8 +141,9 @@ Email a summary of this month's revenue to finance@ourcompany.com.
 ```
 
 Open the tool call in the trace and you'll see the arguments the model generated for
-`to`, `subject`, and `body`, plus the canned string it got back. The call is real, the
-send isn't.
+`to`, `subject`, and `body`, plus the confirmation string it got back. This tool isn't
+connected to an actual email service, but the tool call itself works the same way a
+real one would.
 
 Tools are the same for both open-source deep agents and MDA.
 
