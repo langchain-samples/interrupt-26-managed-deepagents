@@ -84,7 +84,9 @@ sandbox = define_sandbox(scope="thread")
 One import, one function call.
 
 <details>
-<summary>If you were self-hosting this with open-source deepagents (instead of MDA), this is what sandbox code looks like</summary>
+<summary>If you were self-hosting this with open-source deepagents (instead of MDA):</summary>
+
+this is what sandbox code looks like:
 
 ```python
 from deepagents.backends import LangSmithSandbox  # or Modal/Runloop/Daytona
@@ -94,7 +96,7 @@ agent = create_deep_agent(model=..., backend=sandbox)
 ```
 
 That means standing up a sandbox provider, creating a client, creating a sandbox, and
-passing it through to the agent yourself (with open-source deep agents).
+passing it through to the agent yourself.
 
 </details>
 
