@@ -18,7 +18,6 @@ Sakila database, inside a managed sandbox, then answers in plain English.
 - `pyproject.toml`, `uv.lock`: project dependencies.
 - `.env`: API keys (LangSmith and your model provider); never commit this.
 - `artifacts/`: sandbox scratch output; gitignored.
-- `images/`: screenshots used in this README.
 
 ## Steps
 
@@ -29,7 +28,10 @@ Everything below runs in a terminal, in this project's folder, unless it says ot
 
 ## 1. Setup
 
-Open a terminal in this project's folder and run:
+Open a terminal in this project's folder (widen it) and run:
+
+> *Widening it keeps the Dashboard URL from being split across two lines, which makes it
+> easier to copy/paste.*
 
 ```
 uv tool install managed-deepagents
@@ -55,12 +57,6 @@ and a key for whichever model provider you want to use.
 
 However using another provider (OpenAI, Google, etc.) is very simple! 
 Just change the key name in `.env` and the `model=` line in `agent.py` to match.
-
-Widen your terminal window first: the deploy summary box below wraps to whatever width
-your terminal is at that moment, and if it's too narrow the Dashboard URL gets split across
-two lines like this, which breaks it if you copy it as-is.
-
-![Deploy summary box with the Dashboard URL wrapped because the terminal was too narrow](images/CLI%20too%20narrow.png)
 
 ```
 mda deploy .
