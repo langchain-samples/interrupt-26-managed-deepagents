@@ -79,8 +79,7 @@ with your agent.
 every turn, so editing it changes how the agent behaves (with no code changes at all).
 
 We've already written the instructions that tell this agent to run SQL and Python against
-sakila.db. But instructions alone aren't enough; the agent also needs somewhere to actually
-run that code, which is what `sandbox/__init__.py` provides.
+sakila.db. `sandbox/__init__.py` declares the sandbox it runs that code in.
 
 This is how MDA does it:
 
