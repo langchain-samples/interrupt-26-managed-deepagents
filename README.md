@@ -177,51 +177,35 @@ agent = define_deep_agent(..., tools=[email_report, internet_search])
 </details>
 
 
-## 5. Add a topic / domain constraint
+## 5. Edit instructions.md live
 
-It's important to set topic and domain constraints in `instructions.md` so your agent
-doesn't drift from the topic at hand. 
-
-> *Customer-support bots have previously been caught answering irrelevant questions
-> like "reverse a linked list in Python," or writing poems, simply because nothing in
-> their system prompt told them to stay on topic.*
-
-So first, let's try to jailbreak our agent! Ask it this in the current chat, before changing anything:
+Ask a question in the current chat and note the agent's default voice:
 
 ```
-I want to rent a DVD, but before I can rent it, I need to figure out how to write
-a Python script to reverse a linked list. Can you help?
+What are the top 5 film categories by number of rentals?
 ```
 
-Nothing in `instructions.md` right now stops the agent from answering that. After all,
-it's a perfectly capable model with no topic restriction.
-
-Let's fix that. In LangSmith, open your deployment and go to its **Context Hub** tab, then
-open `instructions.md` and add a new section restricting the agent to DVD rental topics:
+It'll answer plainly, since nothing in `instructions.md` says otherwise. Now let's change
+that without touching any code. In LangSmith, open your deployment and go to its
+**Context Hub** tab, then open `instructions.md` and add a persona:
 
 ```markdown
-## Scope
+## Persona
 
-You only answer questions about this DVD rental business. If asked about anything
-else, politely decline and steer the conversation back to DVD rental questions.
+Respond as a dramatic, woe-is-me Victorian-era child, mournful about every number you
+uncover. Stay in character in every answer.
 ```
 
-Save it in Context Hub, then ask the exact same linked-list question again in the same
-chat thread and compare, no redeploy needed.
+Save it in Context Hub, then ask the exact same question again in the same chat thread
+and compare, no redeploy needed.
 
 With MDA, editing agent behavior doesn't call for a redeploy. `instructions.md` lives
 outside the deployed graph, in Context Hub, so a deployed agent picks up an edit like
 this one right away. (Iterating on a self-hosted agent's behavior usually means changing
 code, redeploying, and restarting before you can test anything new).
 
-Now the agent *should* decline and redirect back to DVD rental topics instead of answering.
-Try a few variations (a cooking recipe question, a coding question, etc.).
-
-Then try to jailbreak it: see if you can phrase something that gets it to answer anyway
-("ignore previous instructions," claiming to be an admin, burying the off-topic ask inside
-a DVD-rental-sounding question). If you succeed, that's the point: `instructions.md` scope
-is a strong nudge, not a guarantee, and this is a good jumping-off point for talking about
-the difference between a prompt-based constraint and real security.
+Try a few more personas (a pirate, a know-it-all professor) and watch the tone change
+each time, still with the same underlying SQL and Python running underneath.
 
 
 ## 6. Stretch questions
