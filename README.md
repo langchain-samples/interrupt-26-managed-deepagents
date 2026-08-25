@@ -2,17 +2,16 @@
 
 ## Overview
 
-Workshop project for Interrupt 2026 NYC: a DVD-rental analyst agent built on
+A DVD-rental analyst agent built on
 [`managed-deepagents`](https://github.com/langchain-ai/managed-deepagents-sdk) (MDA). Ask it a
 business question and it writes and runs its own SQL (and Python, for charts) against a sample
 Sakila database, inside a managed sandbox, then answers in plain English.
 
 ## What's in this repo
 
-- `README.md`: this file, the workshop walkthrough plus a reference appendix.
+- `README.md`: the workshop walkthrough plus a reference appendix.
 - `agent.py`: defines the agent, its model, and its tools. The `name` here is also the deploy id.
-- `instructions.md`: the agent's system prompt, loaded fresh on every turn.
-- `identity.py`: declares who may call this deployment.
+- `instructions.md`: the agent's system prompt, editable in Context Hub.
 - `sandbox/__init__.py`: declares the managed sandbox the agent runs code in.
 - `sandbox/setup.sh`: one-time script that provisions that sandbox (loads the Sakila database, installs Python packages).
 - `sakila.db`: the sample DVD-rental SQLite database the agent queries.
@@ -194,11 +193,35 @@ To learn more about deep agents, continue with the full **LangChain Academy Deep
 Reference detail for anyone who wants to go past the steps above. None of this is required
 to finish the workshop.
 
-### Identity
+### At a glance: this workshop vs. a typical MDA project
 
-`identity.py` enables managed authentication: threads and downstream credentials are
-per-caller. Set `auth` to one or more `auth.*` entries if browsers call the deployment
-directly. Durable memory is declared separately, in `memory.py`.
+| Path | In this workshop |
+|---|---|
+| `agent.py` | Yes, defines the agent, its model, and its tools |
+| `instructions.md` | Yes, the system prompt |
+| `sandbox/__init__.py`, `sandbox/setup.sh` | Yes, declares and provisions the sandbox |
+| `sakila.db` | Yes, the sample database the agent queries |
+| `tools/` | Yes, empty here, add custom tools |
+| `connectors/` | Yes, empty here, declare MCP servers |
+| `pyproject.toml`, `uv.lock` | Yes, project dependencies |
+| `.env` | Yes, API keys |
+| `artifacts/` | Yes, sandbox scratch output |
+| ---- | ---- |
+| `identity.py` | No, adds managed auth, see [Identity](#identity-optional-not-included-here) |
+| `memory.py` | No, adds durable memory, see [Memory](#memory) |
+| `middleware/` | No, custom middleware |
+| `skills/` | No, skills synced to Context Hub |
+| `evals/` | No, Harbor evals, see [Evals](#evals) |
+
+### Identity (optional, not included here)
+
+This project has no `identity.py`, so `mda dev` runs with no managed auth. To require
+callers to authenticate, add `identity.py` exporting an `identity = define_identity(auth=...)`
+declaration (for example `auth.langsmith_api_key()`). That gives every caller private
+threads and downstream credentials. See the
+[identity docs](https://docs.langchain.com/langsmith/python/managed-deep-agents-identity)
+for the available `auth.*` options. Durable memory is a separate concept, declared in
+`memory.py`.
 
 ### Memory
 
