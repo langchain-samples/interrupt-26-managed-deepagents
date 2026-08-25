@@ -4,7 +4,7 @@
 
 A DVD-rental analyst agent built on
 [`managed-deepagents`](https://github.com/langchain-ai/managed-deepagents-sdk) (MDA). Ask it a
-business question and it writes and runs its own SQL (and Python, for charts) against a sample
+business question and it writes and runs its own SQL and Python against a sample
 Sakila database, inside a managed sandbox, then answers in plain English.
 
 ## What's in this repo
@@ -15,11 +15,9 @@ Sakila database, inside a managed sandbox, then answers in plain English.
 - `sandbox/__init__.py`: declares the managed sandbox the agent runs code in.
 - `sandbox/setup.sh`: one-time script that provisions that sandbox (loads the Sakila database, installs Python packages).
 - `sakila.db`: the sample DVD-rental SQLite database the agent queries.
-- `tools/`: optional custom tools beyond the one already in `agent.py` (empty for now).
-- `connectors/`: optional MCP server declarations (empty for now).
 - `pyproject.toml`, `uv.lock`: project dependencies.
 - `.env`: API keys (LangSmith and your model provider); never commit this.
-- `artifacts/`: sandbox scratch output, such as charts the agent writes; gitignored.
+- `artifacts/`: sandbox scratch output; gitignored.
 
 ## Steps
 
@@ -123,6 +121,34 @@ Open `agent.py` and look at the `tools=[...]` list. It has one custom tool,
 
 Tools are the same for both open-source deep agents and MDA.
 
+<details>
+<summary>When would you split a tool into its own file?</summary>
+
+`format_currency` is a two-line helper, so it's defined right in `agent.py`. Once a tool needs
+its own dependency or setup, for example an `internet_search` tool that wraps a Tavily client,
+it's cleaner to give it a home in `tools/search.py` and import it into `agent.py`:
+
+```python
+# tools/search.py
+from langchain.tools import tool
+from tavily import TavilyClient
+
+@tool
+def internet_search(query: str, max_results: int = 5) -> str:
+    """Search the web for a query."""
+    client = TavilyClient()
+    return client.search(query, max_results=max_results)
+```
+
+```python
+# agent.py
+from tools.search import internet_search
+
+agent = define_deep_agent(..., tools=[format_currency, internet_search])
+```
+
+</details>
+
 
 ## 5. Add a topic / domain constraint
 
@@ -200,8 +226,6 @@ To learn more about deep agents, continue with the full **LangChain Academy Deep
 | `instructions.md` | The system prompt |
 | `sandbox/__init__.py`, `sandbox/setup.sh` | Declares and provisions the sandbox |
 | `sakila.db` | The sample database the agent queries |
-| `tools/` | Empty here, add custom tools |
-| `connectors/` | Empty here, declare MCP servers |
 | `pyproject.toml`, `uv.lock` | Project dependencies |
 | `.env` | API keys |
 | `artifacts/` | Sandbox scratch output |
@@ -210,10 +234,12 @@ To learn more about deep agents, continue with the full **LangChain Academy Deep
 
 | Component | What it does |
 |---|---|
-| `identity.py` | Adds managed auth, see [Identity](#identity-optional-not-included-here) |
+| `identity.py` | Adds managed auth, see [Identity](#identity) |
 | `memory.py` | Adds durable memory, see [Memory](#memory) |
-| `middleware/` | Custom middleware |
-| `skills/` | Skills synced to Context Hub |
+| `tools/` | Organizes multiple or heavier tools as separate files, see [Optional runtime pieces](#optional-runtime-pieces) |
+| `middleware/` | Custom middleware, see [Optional runtime pieces](#optional-runtime-pieces) |
+| `skills/` | Skills synced to Context Hub, see [Optional runtime pieces](#optional-runtime-pieces) |
+| `connectors/mcp.py` | Attaches MCP servers, see [Optional runtime pieces](#optional-runtime-pieces) |
 | `evals/` | Harbor evals, see [Evals](#evals) |
 
 ### Identity
@@ -233,11 +259,14 @@ exporting `define_memory(scope="agent")` to give the agent a persistent director
 
 ### Optional runtime pieces
 
-Beyond `tools/` and `sandbox/`, an MDA project can also declare:
+None of these are present in this project. Beyond `sandbox/`, an MDA project can also declare:
 
-- `middleware/`: custom middleware (not used in this project).
-- `skills/`: skills synced to Context Hub (not used in this project).
-- `connectors/mcp.py`: attaches MCP servers; the file must export a named `connector` declaration (present but empty in this project).
+- `tools/`: a place to define tools as separate files instead of inline in `agent.py`, useful
+  once you have more than a couple, or ones with heavier dependencies (this project's one tool,
+  `format_currency`, is a two-line helper defined directly in `agent.py`).
+- `middleware/`: custom middleware.
+- `skills/`: skills synced to Context Hub.
+- `connectors/mcp.py`: attaches MCP servers; the file must export a named `connector` declaration.
 
 ---
 
@@ -252,7 +281,8 @@ pip install --quiet --break-system-packages pandas matplotlib
 Installs the two libraries the agent's Python analysis relies on:
 
 - `pandas` for querying and shaping data
-- `matplotlib` for the charts it can produce
+- `matplotlib`, available for charting, though this project's `instructions.md` currently
+  tells the agent to skip charts and images and stick to text
 
 ```bash
 curl -s -o /tmp/sakila-schema.sql https://raw.githubusercontent.com/jOOQ/sakila/main/sqlite-sakila-db/sqlite-sakila-schema.sql
@@ -267,8 +297,8 @@ Downloads the Sakila sample database's schema and its data as two SQL files, loa
 ```bash
 mkdir -p artifacts
 ```
-Creates the `artifacts/` directory the sandbox writes generated files to (such as the charts
-`matplotlib` produces), so the very first write doesn't fail on a missing folder.
+Creates the `artifacts/` directory the sandbox writes generated files to, so the very first
+write doesn't fail on a missing folder.
 
 ### Deploy
 
