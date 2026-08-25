@@ -134,6 +134,16 @@ written summary.
 Open `agent.py` and look at the `tools=[...]` list. It has one custom tool,
 `email_report`, a plain Python function decorated with `@tool`. 
 
+Ask your agent (in the same chat):
+
+```
+Email a summary of this month's revenue to finance@ourcompany.com.
+```
+
+Open the tool call in the trace and you'll see the arguments the model generated for
+`to`, `subject`, and `body`, plus the canned string it got back. The call is real, the
+send isn't.
+
 Tools are the same for both open-source deep agents and MDA.
 
 <details>
