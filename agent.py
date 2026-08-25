@@ -1,4 +1,4 @@
-from langchain_core.tools import tool
+from langchain.tools import tool
 from managed_deepagents import define_deep_agent
 
 

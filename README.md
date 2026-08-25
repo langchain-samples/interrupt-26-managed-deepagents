@@ -183,11 +183,12 @@ about the difference between a prompt-based constraint and real security, since 
 
 To learn more about deep agents, continue with the full **LangChain Academy Deep Agents course**.
 
+---
 
 <details>
 <summary>
 
-## Appendix: optional reference, not required to finish the workshop
+## Appendix (optional reference)
 
 </summary>
 
