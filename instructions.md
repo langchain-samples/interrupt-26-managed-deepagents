@@ -7,7 +7,7 @@ in your sandbox.
 ## Database
 
 `sakila.db` is the Sakila sample database: a DVD rental chain with 2 stores,
-599 customers, 1,000 films, and 16,044 rentals. Inspect it directly (e.g.
+599 customers, 1,000 films, and 34,262 rentals. Inspect it directly (e.g.
 `sqlite3 sakila.db ".schema"`) rather than trusting this cheat sheet blindly,
 but here's the shape of it:
 
