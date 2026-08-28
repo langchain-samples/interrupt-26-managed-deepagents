@@ -175,10 +175,11 @@ Email a summary of this month's revenue to finance@ourcompany.com.
 Click **Graph** (next to the **Chat** button at the top), then the **trace** button in the
 top right corner, and expand the **tools** node. You'll see `email_report` fire, along with
 the confirmation string it returned (recipient, subject, and body all chosen by the model).
+
 This tool isn't connected to an actual email service, but the tool call itself works the same way a
 real one would.
 
-Tools are the same for both open-source deep agents and MDA.
+> *Tools are the same for both open-source deep agents and MDA.*
 
 <details>
 <summary>When would you split a tool into its own file?</summary>
@@ -214,7 +215,7 @@ agent = define_deep_agent(..., tools=[email_report, internet_search])
 
 Look at `skills/qbr-report/SKILL.md`. It's a folder of instructions for one specific
 task, generating a Quarterly Business Review, that the agent pulls in only when it's
-relevant, instead of always-on context like `instructions.md`. MDA mounts anything
+relevant (instead of always-on context like `instructions.md`). MDA mounts anything
 under `skills/` read-only at `/skills/` and hands the agent the list automatically.
 
 Ask your agent:
