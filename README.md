@@ -81,9 +81,8 @@ hands it to the model on every turn, so editing it changes how the agent behaves
 code changes at all).
 
 We've already written the instructions that tell this agent to run SQL and Python against
-sakila.db. `sandbox/__init__.py` declares the sandbox it runs that code in.
-
-This is how MDA does it:
+sakila.db. `sandbox/__init__.py` declares the sandbox it runs that code in. The following
+code is the whole file:
 
 ```python
 from managed_deepagents import define_sandbox
