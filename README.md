@@ -4,8 +4,8 @@
 
 A DVD-rental analyst agent built on
 [`managed-deepagents`](https://github.com/langchain-ai/managed-deepagents-sdk) (MDA). Ask it a
-business question and it writes and runs its own SQL and Python against a sample
-Sakila database, inside a managed sandbox, then answers in plain English.
+business question and it writes and runs its own SQL and Python against `sakila.db`
+(based on the sample Sakila dataset), inside a managed sandbox.
 
 ## What's in this repo
 
