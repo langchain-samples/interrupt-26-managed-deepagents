@@ -96,10 +96,6 @@ written summary.
 
 ## 3. Skim the wiring (read-only)
 
-Open Context Hub and go to `instructions.md`, this agent's system prompt. MDA loads it and
-hands it to the model on every turn, so editing it changes how the agent behaves (with no
-code changes at all).
-
 We've already written the instructions that tell this agent to run SQL and Python against
 sakila.db. `sandbox/__init__.py` declares the sandbox it runs that code in. The following
 code is the whole file:
@@ -111,9 +107,6 @@ sandbox = define_sandbox(scope="thread")
 ```
 
 One import, one function call.
-
-> *To get back to Studio: click into **Deployments**, click **Connect**, then
-> **Open in Studio**.*
 
 <details>
 <summary>If you were self-hosting this with open-source deepagents (instead of MDA):</summary>
@@ -133,8 +126,46 @@ passing it through to the agent yourself.
 
 </details>
 
+Open Context Hub and go to `instructions.md`, this agent's system prompt. MDA loads it and
+hands it to the model on every turn, so editing it changes how the agent behaves (with no
+code changes at all).
 
-## 4. Skim the tools
+> *To get back to Studio: click into **Deployments**, click **Connect**, then
+> **Open in Studio**.*
+
+
+## 4. Edit instructions.md live
+
+Ask a question in the current chat and note the agent's default voice:
+
+```
+What are the top 5 film categories by number of rentals?
+```
+
+It'll answer plainly, since nothing in `instructions.md` says otherwise. Now let's change
+that without touching any code: back in Context Hub, open `instructions.md` again and add
+a persona:
+
+```markdown
+## Persona
+
+Respond as a dramatic, woe-is-me Victorian-era child, mournful about every number you
+uncover. Stay in character in every answer.
+```
+
+Save it in Context Hub, then ask the exact same question again in the same chat thread
+and compare, no redeploy needed.
+
+With MDA, editing agent behavior doesn't call for a redeploy. `instructions.md` lives
+outside the deployed graph, in Context Hub, so a deployed agent picks up an edit like
+this one right away. (Iterating on a self-hosted agent's behavior usually means changing
+code, redeploying, and restarting before you can test anything new).
+
+Try a few more personas (a pirate, a know-it-all professor) and watch the tone change
+each time, still with the same underlying SQL and Python running underneath.
+
+
+## 5. Skim the tools
 
 Open `agent.py` and look at the `tools=[...]` list. It has one custom tool,
 `email_report`, a plain Python function decorated with `@tool`. 
@@ -180,37 +211,6 @@ agent = define_deep_agent(..., tools=[email_report, internet_search])
 ```
 
 </details>
-
-
-## 5. Edit instructions.md live
-
-Ask a question in the current chat and note the agent's default voice:
-
-```
-What are the top 5 film categories by number of rentals?
-```
-
-It'll answer plainly, since nothing in `instructions.md` says otherwise. Now let's change
-that without touching any code. In LangSmith, open your deployment and go to its
-**Context Hub** tab, then open `instructions.md` and add a persona:
-
-```markdown
-## Persona
-
-Respond as a dramatic, woe-is-me Victorian-era child, mournful about every number you
-uncover. Stay in character in every answer.
-```
-
-Save it in Context Hub, then ask the exact same question again in the same chat thread
-and compare, no redeploy needed.
-
-With MDA, editing agent behavior doesn't call for a redeploy. `instructions.md` lives
-outside the deployed graph, in Context Hub, so a deployed agent picks up an edit like
-this one right away. (Iterating on a self-hosted agent's behavior usually means changing
-code, redeploying, and restarting before you can test anything new).
-
-Try a few more personas (a pirate, a know-it-all professor) and watch the tone change
-each time, still with the same underlying SQL and Python running underneath.
 
 
 ## 6. Use a skill: generate a QBR report
