@@ -172,9 +172,10 @@ Ask your agent (in the same chat):
 Email a summary of this month's revenue to finance@ourcompany.com.
 ```
 
-Open the tool call in the trace and you'll see `email_report` fire with the recipient
-and subject the model chose, plus the confirmation string it got back. This tool isn't
-connected to an actual email service, but the tool call itself works the same way a
+Click **Graph** (next to the **Chat** button at the top), then the **trace** button in the
+top right corner, and expand the **tools** node. You'll see `email_report` fire, along with
+the confirmation string it returned (recipient, subject, and body all chosen by the model).
+This tool isn't connected to an actual email service, but the tool call itself works the same way a
 real one would.
 
 Tools are the same for both open-source deep agents and MDA.
