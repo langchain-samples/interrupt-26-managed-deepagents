@@ -130,8 +130,10 @@ passing it through to the agent yourself.
 ## 4. Edit instructions.md live
 
 You've already seen the agent answer plainly. Open Context Hub and go to
-`instructions.md`, this agent's system prompt: MDA hands it to the model on every turn, so
-editing it changes how the agent behaves, no code changes needed. Add a persona:
+`instructions.md`, this agent's system prompt: MDA hands this to the model on every turn,
+so editing it changes how the agent behaves.
+
+Add a persona to your agent:
 
 ```markdown
 ## Persona
@@ -151,8 +153,11 @@ picks up an edit like this immediately, no redeploy needed. (Iterating on a self
 agent's behavior usually means changing code, redeploying, and restarting before you can
 test anything new).
 
-Try a few more personas (a pirate, a know-it-all professor) and watch the tone change
+Try a few more personas (a pirate, a cowboy, an alien, etc.) and watch the tone change
 each time, still with the same underlying SQL and Python running underneath.
+
+The same mechanism works for real branding too, not just novelty personas: tone,
+formality, terminology, whatever your company's voice calls for.
 
 
 ## 5. Skim the tools
