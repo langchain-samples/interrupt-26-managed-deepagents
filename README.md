@@ -129,11 +129,9 @@ passing it through to the agent yourself.
 
 ## 4. Edit instructions.md live
 
-You've already seen the agent answer plainly, since nothing in `instructions.md` says
-otherwise. Open Context Hub and go to `instructions.md`, this agent's system prompt. MDA
-loads it and hands it to the model on every turn, so editing it changes how the agent
-behaves (with no code changes at all). Now let's change that without touching any code:
-add a persona:
+You've already seen the agent answer plainly. Open Context Hub and go to
+`instructions.md`, this agent's system prompt: MDA hands it to the model on every turn, so
+editing it changes how the agent behaves, no code changes needed. Add a persona:
 
 ```markdown
 ## Persona
@@ -147,13 +145,11 @@ Save it in Context Hub.
 > *To get back to Studio: click into **Deployments**, click **Connect**, then
 > **Open in Studio**.*
 
-Ask one of your earlier questions again in the same chat thread and compare, no redeploy
-needed.
-
-With MDA, editing agent behavior doesn't call for a redeploy. `instructions.md` lives
-outside the deployed graph, in Context Hub, so a deployed agent picks up an edit like
-this one right away. (Iterating on a self-hosted agent's behavior usually means changing
-code, redeploying, and restarting before you can test anything new).
+Ask one of your earlier questions again in the same chat thread and compare.
+`instructions.md` lives outside the deployed graph, in Context Hub, so a deployed agent
+picks up an edit like this immediately, no redeploy needed. (Iterating on a self-hosted
+agent's behavior usually means changing code, redeploying, and restarting before you can
+test anything new).
 
 Try a few more personas (a pirate, a know-it-all professor) and watch the tone change
 each time, still with the same underlying SQL and Python running underneath.
