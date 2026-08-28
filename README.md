@@ -12,6 +12,7 @@ Sakila database, inside a managed sandbox, then answers in plain English.
 - `README.md`: the workshop walkthrough plus a reference appendix.
 - `agent.py`: defines the agent, its model, and its tools. The `name` here is also the deploy id.
 - `instructions.md`: the agent's system prompt, editable in Context Hub.
+- `skills/`: task-specific playbooks the agent pulls in on demand, also editable in Context Hub.
 - `sandbox/__init__.py`: declares the managed sandbox the agent runs code in.
 - `sandbox/setup.sh`: one-time script that provisions that sandbox (loads the Sakila database, installs Python packages).
 - `sakila.db`: the sample DVD-rental SQLite database the agent queries.
@@ -208,7 +209,30 @@ Try a few more personas (a pirate, a know-it-all professor) and watch the tone c
 each time, still with the same underlying SQL and Python running underneath.
 
 
-## 6. Stretch questions
+## 6. Use a skill: generate a QBR report
+
+Look at `skills/qbr-report/SKILL.md`. It's a folder of instructions for one specific
+task, generating a Quarterly Business Review, that the agent pulls in only when it's
+relevant, instead of always-on context like `instructions.md`. MDA mounts anything
+under `skills/` read-only at `/skills/` and hands the agent the list automatically.
+
+Ask your agent:
+
+```
+Generate a QBR report for the most recently completed quarter, broken down by
+language, category, and top actors.
+```
+
+The skill tells the agent which quarter to use, which tables to join for each
+breakdown (language, category, actor), and how to structure the write-up. Try asking
+for a specific quarter instead (e.g. "Q1 2026") and compare the two reports.
+
+A skill and `instructions.md` both live in Context Hub and both update without a
+redeploy, but they're for different things: `instructions.md` shapes how the agent
+behaves on every turn, a skill is a playbook the agent reaches for on demand.
+
+
+## 7. Stretch questions
 
 4. Which actors have appeared in the most films?
 5. What's the average rental duration, by category?
