@@ -64,20 +64,21 @@ Just change the key name in `.env` and the `model=` line in `agent.py` to match.
 mda deploy .
 ```
 
-This builds and pushes the project to LangSmith. When it finishes (~5mins), it prints an
+This builds and pushes the project to LangSmith. When it finishes (~5 mins), it prints an
 Agent Server URL and a LangSmith dashboard URL.
 
 ![Terminal output from mda deploy ., ending with the Agent Server and Dashboard URLs](images/CLI.png)
 
-**Copy and paste the dashboard URL**, it will open up in LangSmith Deployments. Then click on the
-blue **Connect** button in the top right corner and click the **Open in Studio** button to chat
-with your agent.
+1. **Copy and paste the dashboard URL**, it will open up in LangSmith Deployments.
+2. Click on the blue **Connect** button in the top right corner.
+3. Click the **Open in Studio** button to chat with your agent.
 
 
 ## 2. Skim the wiring (read-only)
 
-`instructions.md` is this agent's system prompt: MDA loads it and hands it to the model on
-every turn, so editing it changes how the agent behaves (with no code changes at all).
+Open Context Hub and go to `instructions.md`, this agent's system prompt. MDA loads it and
+hands it to the model on every turn, so editing it changes how the agent behaves (with no
+code changes at all).
 
 We've already written the instructions that tell this agent to run SQL and Python against
 sakila.db. `sandbox/__init__.py` declares the sandbox it runs that code in.
