@@ -19,7 +19,9 @@ Run SQL against `sakila.db` for the chosen date range (`rental.rental_date` /
 `payment.payment_date`) to get:
 
 1. **Overview** — total revenue (`SUM(payment.amount)`), total rentals
-   (`COUNT(*)` on `rental`), and how both compare to the prior quarter.
+   (`COUNT(DISTINCT rental_id)`, not a count of payment rows: a rental can have
+   more than one payment, e.g. a late fee), and how both compare to the prior
+   quarter.
 2. **Revenue by language** — join `payment` → `rental` → `inventory` → `film`
    → `language`, group by `language.name`.
 3. **Revenue by category (genre)** — join the same chain through
