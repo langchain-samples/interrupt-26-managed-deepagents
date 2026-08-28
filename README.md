@@ -74,7 +74,27 @@ Agent Server URL and a LangSmith dashboard URL.
 3. Click the **Open in Studio** button to chat with your agent.
 
 
-## 2. Skim the wiring (read-only)
+## 2. Try it out! Ask your agent questions
+
+Type / paste these into LangSmith Studio, or write your own.
+Here are some example questions to use:
+
+1. What's our monthly revenue trend? Break it down as a table.
+2. What are the top 5 film categories by number of rentals?
+3. How does revenue compare between our two stores?
+
+Ask any question and the agent writes + runs its own SQL (and Python, if the
+question calls for further analysis) inside the sandbox → then answers with a short
+written summary. 
+
+- **Sandbox isolation:** the agent's code can't touch your machine, other threads' data, or
+  anything outside its own scratch space.
+- **Sandbox persistence:** follow-up questions in the same thread reuse earlier results
+  instead of recomputing them, because MDA provisions one real sandbox per thread
+  (`scope="thread"`) and reuses it. Self-hosted deepagents doesn't do this automatically.
+
+
+## 3. Skim the wiring (read-only)
 
 Open Context Hub and go to `instructions.md`, this agent's system prompt. MDA loads it and
 hands it to the model on every turn, so editing it changes how the agent behaves (with no
@@ -91,6 +111,9 @@ sandbox = define_sandbox(scope="thread")
 ```
 
 One import, one function call.
+
+> *To get back to Studio: click into **Deployments**, click **Connect**, then
+> **Open in Studio**.*
 
 <details>
 <summary>If you were self-hosting this with open-source deepagents (instead of MDA):</summary>
@@ -109,25 +132,6 @@ That means standing up a sandbox provider, creating a client, creating a sandbox
 passing it through to the agent yourself.
 
 </details>
-
-## 3. Try it out! Ask your agent questions
-
-Type / paste these into LangSmith Studio, or write your own.
-Here are some example questions to use:
-
-1. What's our monthly revenue trend? Break it down as a table.
-2. What are the top 5 film categories by number of rentals?
-3. How does revenue compare between our two stores?
-
-Ask any question and the agent writes + runs its own SQL (and Python, if the
-question calls for further analysis) inside the sandbox → then answers with a short
-written summary. 
-
-- **Sandbox isolation:** the agent's code can't touch your machine, other threads' data, or
-  anything outside its own scratch space.
-- **Sandbox persistence:** follow-up questions in the same thread reuse earlier results
-  instead of recomputing them, because MDA provisions one real sandbox per thread
-  (`scope="thread"`) and reuses it. Self-hosted deepagents doesn't do this automatically.
 
 
 ## 4. Skim the tools
