@@ -18,9 +18,9 @@ UPDATE film SET language_id = 2 WHERE film_id BETWEEN 121 AND 200; -- Italian
 UPDATE film SET language_id = 3 WHERE film_id BETWEEN 201 AND 250; -- Japanese
 
 UPDATE rental SET
-  rental_date = datetime(rental_date, '+7617 days'),
-  return_date = datetime(return_date, '+7617 days');
-UPDATE payment SET payment_date = datetime(payment_date, '+7617 days');
+  rental_date = datetime(rental_date, '+7595 days'),
+  return_date = datetime(return_date, '+7595 days');
+UPDATE payment SET payment_date = datetime(payment_date, '+7595 days');
 
 -- The source data also stamps a batch of still-checked-out rentals with its
 -- generation timestamp instead of a real date; after the shift that lands in

@@ -368,9 +368,9 @@ UPDATE film SET language_id = 2 WHERE film_id BETWEEN 121 AND 200; -- Italian
 UPDATE film SET language_id = 3 WHERE film_id BETWEEN 201 AND 250; -- Japanese
 
 UPDATE rental SET
-  rental_date = datetime(rental_date, '+7617 days'),
-  return_date = datetime(return_date, '+7617 days');
-UPDATE payment SET payment_date = datetime(payment_date, '+7617 days');
+  rental_date = datetime(rental_date, '+7595 days'),
+  return_date = datetime(return_date, '+7595 days');
+UPDATE payment SET payment_date = datetime(payment_date, '+7595 days');
 
 UPDATE rental SET rental_date = '2026-08-10 15:16:03' WHERE rental_date > '2026-08-15';
 UPDATE payment SET payment_date = '2026-08-10 15:16:03' WHERE payment_date > '2026-08-15';
