@@ -9,4 +9,24 @@ sqlite3 sakila.db < /tmp/sakila-schema.sql
 sqlite3 sakila.db < /tmp/sakila-data.sql
 rm -f /tmp/sakila-schema.sql /tmp/sakila-data.sql
 
+# The public Sakila sample only has English films and dates from 2005-2006.
+# Diversify some films into other languages, and shift dates into a recent
+# window so "this quarter"/"last quarter" resolve sensibly in a live demo.
+sqlite3 sakila.db <<'SQL'
+UPDATE film SET language_id = 5 WHERE film_id BETWEEN 1 AND 120;   -- French
+UPDATE film SET language_id = 2 WHERE film_id BETWEEN 121 AND 200; -- Italian
+UPDATE film SET language_id = 3 WHERE film_id BETWEEN 201 AND 250; -- Japanese
+
+UPDATE rental SET
+  rental_date = datetime(rental_date, '+7617 days'),
+  return_date = datetime(return_date, '+7617 days');
+UPDATE payment SET payment_date = datetime(payment_date, '+7617 days');
+
+-- The source data also stamps a batch of still-checked-out rentals with its
+-- generation timestamp instead of a real date; after the shift that lands in
+-- the future, so pull those back to a recent, still-open-looking date.
+UPDATE rental SET rental_date = '2026-08-10 15:16:03' WHERE rental_date > '2026-08-15';
+UPDATE payment SET payment_date = '2026-08-10 15:16:03' WHERE payment_date > '2026-08-15';
+SQL
+
 mkdir -p artifacts

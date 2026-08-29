@@ -211,12 +211,12 @@ agent = define_deep_agent(..., tools=[email_report, internet_search])
 </details>
 
 
-## 6. Use a skill: generate a QBR report
+## 6. Use a skill, then write your own
 
 Look at `skills/qbr-report/SKILL.md`. It's a folder of instructions for one specific
 task, generating a Quarterly Business Review, that the agent pulls in only when it's
 relevant (instead of always-on context like `instructions.md`). MDA mounts anything
-under `skills/` read-only at `/skills/` and hands the agent the list automatically.
+under `skills/` read-only at `/skills/` and hands the agent the list of skills automatically.
 
 Ask your agent:
 
@@ -226,8 +226,40 @@ language, category, and top actors.
 ```
 
 The skill tells the agent which quarter to use, which tables to join for each
-breakdown (language, category, actor), and how to structure the write-up. Try asking
-for a specific quarter instead (e.g. "Q1 2026") and compare the two reports.
+breakdown (language, category, actor), and how to structure the write-up.
+
+Now write your own. `sakila.db` has 2 staff, each tied to a store:
+
+> *Mike Hillyer runs Store 1, Jon Stephens runs Store 2. Every rental and payment
+> records which staff member handled it.*
+
+Create `skills/staff-performance/SKILL.md`:
+
+```markdown
+---
+name: staff-performance
+description: Review a staff member's performance, revenue processed and rentals
+  handled, at their store. Use whenever someone asks for a staff or employee
+  performance review.
+---
+
+# Staff performance review
+
+Query `sakila.db`, joining `payment` and `rental` to `staff` (by `staff_id`) and
+`staff` to `store`, to get, per staff member: total revenue processed
+(`SUM(payment.amount)`), rentals handled (`COUNT(DISTINCT rental_id)`), and their
+store. Report both staff side by side so their stores can be compared.
+```
+
+Redeploy (`mda deploy .`) to attach it, then ask:
+
+```
+Give me a performance review for our staff.
+```
+
+Your agent now reaches for whichever skill fits the question. Like `qbr-report`,
+once it's deployed you can keep editing `staff-performance/SKILL.md` in Context
+Hub with no redeploy needed.
 
 A skill and `instructions.md` both live in Context Hub and both update without a
 redeploy, but they're for different things: `instructions.md` shapes how the agent
@@ -328,6 +360,28 @@ rm -f /tmp/sakila-schema.sql /tmp/sakila-data.sql
 ```
 Downloads the Sakila sample database's schema and its data as two SQL files, loads both into
 `sakila.db`, then deletes the downloaded files since they've already served their purpose.
+
+```bash
+sqlite3 sakila.db <<'SQL'
+UPDATE film SET language_id = 5 WHERE film_id BETWEEN 1 AND 120;   -- French
+UPDATE film SET language_id = 2 WHERE film_id BETWEEN 121 AND 200; -- Italian
+UPDATE film SET language_id = 3 WHERE film_id BETWEEN 201 AND 250; -- Japanese
+
+UPDATE rental SET
+  rental_date = datetime(rental_date, '+7617 days'),
+  return_date = datetime(return_date, '+7617 days');
+UPDATE payment SET payment_date = datetime(payment_date, '+7617 days');
+
+UPDATE rental SET rental_date = '2026-08-10 15:16:03' WHERE rental_date > '2026-08-15';
+UPDATE payment SET payment_date = '2026-08-10 15:16:03' WHERE payment_date > '2026-08-15';
+SQL
+```
+The public Sakila sample ships with every film in English and all activity dated 2005-2006.
+This reassigns some films to other languages, and shifts rental/payment dates into a recent
+window so questions like "this quarter" resolve against real data instead of two decades ago.
+The last two lines fix up a batch of still-checked-out rentals that the source data stamps
+with its generation timestamp rather than a real date, which the shift would otherwise push
+into the future.
 
 ```bash
 mkdir -p artifacts
