@@ -372,16 +372,23 @@ UPDATE rental SET
   return_date = datetime(return_date, '+7595 days');
 UPDATE payment SET payment_date = datetime(payment_date, '+7595 days');
 
+UPDATE customer SET create_date = '2026-01-01 00:00:00';
+
 UPDATE rental SET rental_date = '2026-08-10 15:16:03' WHERE rental_date > '2026-08-15';
 UPDATE payment SET payment_date = '2026-08-10 15:16:03' WHERE payment_date > '2026-08-15';
+
+UPDATE payment SET amount = 0.99 WHERE amount <= 0;
 SQL
 ```
 The public Sakila sample ships with every film in English and all activity dated 2005-2006.
 This reassigns some films to other languages, and shifts rental/payment dates into a recent
 window so questions like "this quarter" resolve against real data instead of two decades ago.
-The last two lines fix up a batch of still-checked-out rentals that the source data stamps
-with its generation timestamp rather than a real date, which the shift would otherwise push
-into the future.
+It also pins customer signup dates ahead of that window (the source data has them coming
+*after* the rental history, since they're really a record-creation stamp), and clears out a
+handful of source payments recorded at $0.00 so every payment reflects a real transaction.
+The rental/payment override lines fix up a batch of still-checked-out rentals that the source
+data stamps with its generation timestamp rather than a real date, which the shift would
+otherwise push into the future.
 
 ```bash
 mkdir -p artifacts
