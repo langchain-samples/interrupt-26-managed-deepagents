@@ -61,7 +61,7 @@ However using another provider (OpenAI, Google, etc.) is very simple!
 Just change the key name in `.env` and the `model=` line in `agent.py` to match.
 
 ```
-mda deploy .
+uv run mda deploy .
 ```
 
 This builds and pushes the project to LangSmith. When it finishes (~5 mins), it prints an
