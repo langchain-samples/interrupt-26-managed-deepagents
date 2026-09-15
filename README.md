@@ -110,25 +110,6 @@ sandbox = define_sandbox(scope="thread")
 
 One import, one function call.
 
-<details>
-<summary>If you were self-hosting this with open-source deepagents (instead of MDA):</summary>
-<br>
-
-This is what sandbox code looks like:
-
-```python
-from deepagents.backends import LangSmithSandbox  # or Modal/Runloop/Daytona
-client = SandboxClient()
-sandbox = client.create_sandbox(...)
-agent = create_deep_agent(model=..., backend=sandbox)
-```
-
-That means standing up a sandbox provider, creating a client, creating a sandbox, and
-passing it through to the agent yourself.
-
-</details>
-
-
 ## 4. Edit instructions.md live
 
 Open Context Hub and go to
