@@ -9,7 +9,8 @@ def email_report(to: str, subject: str, body: str) -> str:
 
 
 agent = define_deep_agent(
-    name="dvd-rental-analyst",
+    name="dvd-rental-analyst-again",
     model="anthropic:claude-sonnet-5",
     tools=[email_report],
+    interrupt_on={"email_report": True},
 )

@@ -14,7 +14,10 @@ business question and it writes and runs its own SQL and Python against `sakila.
 - `README.md`: the workshop walkthrough plus a reference appendix.
 - `agent.py`: defines the agent, its model, and its tools. The `name` here is also the deploy id.
 - `instructions.md`: the agent's system prompt, editable in Context Hub.
-- `skills/`: task-specific playbooks the agent pulls in on demand, also editable in Context Hub.
+- `skills/`: task-specific playbooks the agent pulls in on demand (`qbr-report`, `staff-performance`), also editable in Context Hub.
+- `identity.py`: declares how callers authenticate (LangSmith API keys). Required once the agent has a channel.
+- `channels/slack.py`: connects the agent to Slack (created by `mda channels init slack`).
+- `schedules/weekly_revenue.py`: a cron schedule that runs the agent and posts the reply to a Slack thread.
 - `sandbox/__init__.py`: declares the managed sandbox the agent runs code in.
 - `sandbox/setup.sh`: one-time script that provisions that sandbox (loads the Sakila database, installs Python packages).
 - `sakila.db`: the sample DVD-rental SQLite database the agent queries.
@@ -51,8 +54,17 @@ Paste in:
 
 ```
 LANGSMITH_API_KEY=
+LANGSMITH_WORKSPACE_ID=
 ANTHROPIC_API_KEY=
 ```
+
+`LANGSMITH_WORKSPACE_ID` is the part after `/o/` in any LangSmith URL. `mda deploy` passes
+it to the deployment, which needs it to read the Slack bot token for inbound Slack messages.
+
+Before deploying, open `schedules/weekly_revenue.py` and set `conversation_id` (your Slack
+Channel ID) and `thread_id` (the ts of the message whose thread the reports should reply in).
+The deploy prints a link to authorize LangSmith to set up your Slack app; open it, allow
+access, and press Enter in the terminal each time it asks.
 
 Fill in a [LangSmith](https://smith.langchain.com) API key (Settings → API Keys) 
 and a key for whichever model provider you want to use. 
@@ -162,6 +174,9 @@ the confirmation string it returned (recipient, subject, and body all chosen by 
 This tool isn't connected to an actual email service, but the tool call itself works the same way a
 real one would.
 
+`agent.py` also sets `interrupt_on={"email_report": True}`, so every `email_report` call
+pauses until you approve or reject it in Studio. Other tools run as before.
+
 > *Tools are the same for both open-source deep agents and MDA.*
 
 <details>
@@ -211,12 +226,12 @@ language, category, and top actors.
 The skill tells the agent which quarter to use, which tables to join for each
 breakdown (language, category, actor), and how to structure the write-up.
 
-Now write your own. `sakila.db` has 2 staff, each tied to a store:
+Now look at a second one. `sakila.db` has 2 staff, each tied to a store:
 
 > *Mike Hillyer runs Store 1, Jon Stephens runs Store 2. Every rental and payment
 > records which staff member handled it.*
 
-Create `skills/staff-performance/SKILL.md`:
+`skills/staff-performance/SKILL.md` reviews them:
 
 ```markdown
 ---
@@ -234,7 +249,7 @@ Query `sakila.db`, joining `payment` and `rental` to `staff` (by `staff_id`) and
 store. Report both staff side by side so their stores can be compared.
 ```
 
-Redeploy (`mda deploy .`) to attach it, then ask:
+Ask:
 
 ```
 Give me a performance review for our staff.
@@ -249,12 +264,23 @@ redeploy, but they're for different things: `instructions.md` shapes how the age
 behaves on every turn, a skill is a playbook the agent reaches for on demand.
 
 
-## 7. Stretch questions
+## 7. Slack and schedules
+
+`channels/slack.py` gives the agent a Slack app (set up during deploy). Invite it to your
+channel (`/invite @<your agent>`) and message it there.
+
+`schedules/weekly_revenue.py` runs the agent every 5 minutes with its `prompt` and posts the
+reply in the configured Slack thread. `*/5 * * * *` is for the demo; a weekly report would
+use `0 9 * * 1`. Posts sent before the app is invited to the channel fail; the next run
+succeeds.
+
+
+## 8. Stretch questions
 
 4. Which actors have appeared in the most films?
 5. What's the average rental duration, by category?
 6. Is there a relationship between a film's length and how often it gets rented?
-
+langch.in/lon-mda-int2
 
 ## Go deeper
 
@@ -276,6 +302,10 @@ To learn more about deep agents, continue with the full **LangChain Academy Deep
 | `agent.py` | Defines the agent, its model, and its tools |
 | `instructions.md` | The system prompt |
 | `sandbox/__init__.py`, `sandbox/setup.sh` | Declares and provisions the sandbox |
+| `skills/` | Skills synced to Context Hub |
+| `identity.py` | Managed auth with LangSmith API keys, see [Identity](#identity) |
+| `channels/slack.py` | Slack channel |
+| `schedules/` | Cron schedules that deliver to Slack |
 | `sakila.db` | The sample database the agent queries |
 | `pyproject.toml`, `uv.lock` | Project dependencies |
 | `.env` | API keys |
@@ -285,20 +315,17 @@ To learn more about deep agents, continue with the full **LangChain Academy Deep
 
 | Component | What it does |
 |---|---|
-| `identity.py` | Adds managed auth, see [Identity](#identity) |
 | `memory.py` | Adds durable memory, see [Memory](#memory) |
 | `tools/` | Organizes multiple or heavier tools as separate files, see [Optional runtime pieces](#optional-runtime-pieces) |
 | `middleware/` | Custom middleware, see [Optional runtime pieces](#optional-runtime-pieces) |
-| `skills/` | Skills synced to Context Hub, see [Optional runtime pieces](#optional-runtime-pieces) |
 | `connectors/mcp.py` | Attaches MCP servers, see [Optional runtime pieces](#optional-runtime-pieces) |
 | `evals/` | Harbor evals, see [Evals](#evals) |
 
 ### Identity
 
-This project has no `identity.py`, so it runs with no managed auth. To require
-callers to authenticate, add `identity.py` exporting an `identity = define_identity(auth=...)`
-declaration (for example `auth.langsmith_api_key()`). That gives every caller private
-threads and downstream credentials. See the
+`identity.py` exports `identity = define_identity(auth=auth.langsmith_api_key())`, so
+callers authenticate with LangSmith API keys. A channel such as Slack requires an identity.
+It also gives every caller private threads and downstream credentials. See the
 [identity docs](https://docs.langchain.com/langsmith/python/managed-deep-agents-identity)
 for the available `auth.*` options.
 
@@ -310,12 +337,11 @@ exporting `define_memory(scope="agent")` to give the agent a persistent director
 
 ### Optional runtime pieces
 
-None of these are present in this project. Beyond `sandbox/`, an MDA project can also declare:
+Beyond `sandbox/`, `skills/`, `channels/`, and `schedules/`, an MDA project can also declare:
 
 - `tools/`: a place to define tools as separate files instead of inline in `agent.py`, useful
   once you have more than a couple, or ones with heavier dependencies.
 - `middleware/`: custom middleware.
-- `skills/`: skills synced to Context Hub.
 - `connectors/mcp.py`: attaches MCP servers; the file must export a named `connector` declaration.
 
 ---
